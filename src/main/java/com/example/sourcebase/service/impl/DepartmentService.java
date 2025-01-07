@@ -17,6 +17,10 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,6 +79,11 @@ public class DepartmentService implements IDepartmentService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public Page<DepartmentResDTO> getAllDepartment(int page, int size, String sortBy, boolean asc) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy));
+        return departmentRepository.findAll(pageable).map(departmentMapper::toDepartmentResDTO);
+    }
 
     public void deleteDepartment(Long id) {
         Department department = departmentRepository.findById(id)
