@@ -17,6 +17,12 @@ public interface IAssessRepository extends JpaRepository<Assess, Long> {
     @Query("SELECT a FROM Assess a WHERE a.user.id = :userId")
     List<Assess> getListAssessByUserId(Long userId);
 
+    @Query("SELECT a FROM Assess a WHERE a.toUser.id = :userId AND a.assessmentType = 'SELF'")
+    Assess getAssessBySelf(Long userId);
+
+    @Query("SELECT a FROM Assess a WHERE a.toUser.id = :userId AND a.assessmentType = 'TEAM'")
+    List<Assess> getListAssessTeamOfUserId(Long userId);
+
     /**
      * find all assess by toUser id
      * @param userId person being rated
