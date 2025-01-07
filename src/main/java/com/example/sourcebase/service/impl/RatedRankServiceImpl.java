@@ -9,6 +9,7 @@ import com.example.sourcebase.domain.dto.resdto.custom.OverallRatedResDto;
 import com.example.sourcebase.domain.enumeration.ERank;
 import com.example.sourcebase.domain.enumeration.ERole;
 import com.example.sourcebase.domain.model.AverageValueInCriteria;
+import com.example.sourcebase.domain.model.OverallOfACriterion;
 import com.example.sourcebase.exception.AppException;
 import com.example.sourcebase.mapper.AssessMapper;
 import com.example.sourcebase.repository.IAssessDetailRepository;
@@ -138,13 +139,10 @@ public class RatedRankServiceImpl implements IRatedRankService {
         OverallRatedResDto result = new OverallRatedResDto();
         // get average value of criteria by team
         List<AverageValueInCriteria> averageValueByTeam = getAverageValueOfCriteriaByTeam(userId);
-        result.setAverageValueByTeam(averageValueByTeam);
         // get average value of criteria by self
         List<AverageValueInCriteria> averageValueBySelf = getAverageValueOfCriteriaBySelf(userId);
-        result.setAverageValueBySelf(averageValueBySelf);
         // get average value of criteria by manager
         List<AverageValueInCriteria> averageValueByManager = getAverageValueOfCriteriaByManager(userId);
-        result.setAverageValueByManager(averageValueByManager);
 
         // Step 1: Collect all unique criteriaIds
         Set<Long> allCriteriaIds = new HashSet<>();
@@ -162,14 +160,16 @@ public class RatedRankServiceImpl implements IRatedRankService {
         int managerWeight = 2;
 
         Criteria c;
+        OverallOfACriterion overallOfACriterion;
+        List<OverallOfACriterion> overallOfCriteria = new ArrayList<>();
 
         int totalCriteriaPoint = 0;
         double totalUserPoint = 0D;
+
         for (int i = 0; i < averageValueByTeam.size(); i++) {
             AverageValueInCriteria team = averageValueByTeam.get(i);
             AverageValueInCriteria self = averageValueBySelf.get(i);
             AverageValueInCriteria manager = averageValueByManager.get(i);
-            System.out.println("team: " + team);
 
             // check if criteriaId of team, self, manager are the same
             if (!Objects.equals(team.getCriteriaId(), self.getCriteriaId())
@@ -187,11 +187,25 @@ public class RatedRankServiceImpl implements IRatedRankService {
                     / 5
                     * pointOfCriterion;
 
-
             // calculate total point
             totalCriteriaPoint += pointOfCriterion;
             totalUserPoint += userPointOfCriteria;
+
+            // map to OverallOfACriterion
+            overallOfACriterion = new OverallOfACriterion(
+                    team.getCriteriaId(),
+                    pointOfCriterion,
+                    c.getTitle(),
+                    self.getAverageValue(),
+                    team.getAverageValue(),
+                    manager.getAverageValue(),
+                    userPointOfCriteria
+            );
+            overallOfCriteria.add(overallOfACriterion);
         }
+
+        // set list overall of criteria
+        result.setOverallOfCriteria(overallOfCriteria);
 
         // calculate overall point
         double overallPoint = totalUserPoint / totalCriteriaPoint * 100;
