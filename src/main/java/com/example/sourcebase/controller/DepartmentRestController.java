@@ -31,13 +31,11 @@ public class DepartmentRestController {
 
     @GetMapping
     public ResponseEntity<ResponseData<?>> getListDepartment() {
-        var departments = departmentService.getAllDepartments();
-
         return ResponseEntity.ok(
                 ResponseData.builder()
                         .code(SuccessCode.GET_SUCCESSFUL.getCode())
                         .message(SuccessCode.GET_SUCCESSFUL.getMessage())
-                        .data(departments)
+                        .data(departmentService.getAllDepartments())
                         .build()
         );
     }
