@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,12 +54,12 @@ public class RatedRankServiceImpl implements IRatedRankService {
                         newestAssess.getId(),
                         newestAssess.getAssessmentDate()
                 );
-        
+
         //group by assessId and criteriaId and get average point on scale 5
         Map<Long, Double> averagePointPerCriteria = adList.stream()
                 .collect(Collectors.groupingBy(
                         ad -> ad.getCriteria().getId(),
-                        Collectors.averagingDouble(ad -> ad.getValue())
+                        Collectors.averagingDouble(AssessDetail::getValue)
                 ));
 
         return averagePointPerCriteria;

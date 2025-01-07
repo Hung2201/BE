@@ -5,7 +5,6 @@ import com.example.sourcebase.domain.enumeration.ETypeAssess;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Arrays;
 import java.util.List;
 
 public interface IAssessRepository extends JpaRepository<Assess, Long> {
