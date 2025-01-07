@@ -41,6 +41,7 @@ public enum ErrorCode {
     DEPARTMENT_NOT_FOUND(40403, "Department not found", HttpStatus.NOT_FOUND),
     DEPARTMENT_ALREADY_EXIST(40904, "Department already exist", HttpStatus.CONFLICT),
 
+    MANAGER_ASSESS_IS_NOT_EXIST(40404, "Không có đánh giá của quản lý", HttpStatus.NOT_FOUND),
     ;
     int code;
     String message;

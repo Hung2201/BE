@@ -1,7 +1,9 @@
 package com.example.sourcebase.controller;
 
 import com.example.sourcebase.domain.dto.reqdto.AssessReqDTO;
+import com.example.sourcebase.repository.ICriteriaRepository;
 import com.example.sourcebase.service.IAssessService;
+import com.example.sourcebase.service.IRatedRankService;
 import com.example.sourcebase.util.ErrorCode;
 import com.example.sourcebase.util.ResponseData;
 import com.example.sourcebase.util.SuccessCode;
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @Transactional
 public class AssessRestController {
     IAssessService assessService;
+    IRatedRankService ratedRankService;
+    ICriteriaRepository criteriaRepository;
+
     @PostMapping("/save-assess")
     @CrossOrigin
     public ResponseEntity<ResponseData<?>> saveAssess(@RequestBody AssessReqDTO assessReqDto) {
@@ -30,6 +35,7 @@ public class AssessRestController {
                         .build()
         );
     }
+
     @GetMapping("/list-assess-of-user/{userId}")
     public ResponseEntity<ResponseData<?>> getListAssessOfUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(
@@ -40,6 +46,7 @@ public class AssessRestController {
                         .build()
         );
     }
+
     @GetMapping("/list-assess-by-user/{userId}")
     public ResponseEntity<ResponseData<?>> getListAssessByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(
@@ -50,6 +57,7 @@ public class AssessRestController {
                         .build()
         );
     }
+
     @GetMapping("/{userId}")
     public ResponseEntity<ResponseData<?>> getAllUserHadSameProject(@PathVariable Long userId) {
         if (assessService.getAssess(userId) == null) {
@@ -65,6 +73,18 @@ public class AssessRestController {
                         .code(SuccessCode.GET_SUCCESSFUL.getCode())
                         .message(SuccessCode.GET_SUCCESSFUL.getMessage())
                         .data(assessService.getAssess(userId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/get-map-manager-rating-point-to-user/{userId}")
+    public ResponseEntity<ResponseData<?>> test(@PathVariable String userId) {
+
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                        .code(SuccessCode.GET_SUCCESSFUL.getCode())
+                        .message(SuccessCode.GET_SUCCESSFUL.getMessage())
+                        .data(ratedRankService.getMapManagerRatingPointToUser(Long.parseLong(userId)))
                         .build()
         );
     }
