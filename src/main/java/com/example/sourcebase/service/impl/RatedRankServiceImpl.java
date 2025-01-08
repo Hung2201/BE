@@ -22,6 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -155,9 +157,7 @@ public class RatedRankServiceImpl implements IRatedRankService {
         normalizeList(averageValueBySelf, allCriteriaIds);
         normalizeList(averageValueByTeam, allCriteriaIds);
 
-        int selfWeight = 1;
-        int teamWeight = 1;
-        int managerWeight = 2;
+        int selfWeight, teamWeight, managerWeight;
 
         Criteria c;
         OverallOfACriterion overallOfACriterion;
@@ -170,6 +170,10 @@ public class RatedRankServiceImpl implements IRatedRankService {
             AverageValueInCriteria team = averageValueByTeam.get(i);
             AverageValueInCriteria self = averageValueBySelf.get(i);
             AverageValueInCriteria manager = averageValueByManager.get(i);
+
+            selfWeight = (team.getAverageValue() == 0) ? 0 : 1;
+            teamWeight = (self.getAverageValue() == 0) ? 0 : 1;
+            managerWeight = (manager.getAverageValue() == 0) ? 0 : 1;
 
             // check if criteriaId of team, self, manager are the same
             if (!Objects.equals(team.getCriteriaId(), self.getCriteriaId())
@@ -196,10 +200,10 @@ public class RatedRankServiceImpl implements IRatedRankService {
                     team.getCriteriaId(),
                     pointOfCriterion,
                     c.getTitle(),
-                    self.getAverageValue(),
-                    team.getAverageValue(),
-                    manager.getAverageValue(),
-                    userPointOfCriteria
+                    round(self.getAverageValue(), 1),
+                    round(team.getAverageValue(), 1),
+                    round(manager.getAverageValue(), 1),
+                    round(userPointOfCriteria, 2)
             );
             overallOfCriteria.add(overallOfACriterion);
         }
@@ -209,7 +213,7 @@ public class RatedRankServiceImpl implements IRatedRankService {
 
         // calculate overall point
         double overallPoint = totalUserPoint / totalCriteriaPoint * 100;
-        result.setOverallPoint(overallPoint);
+        result.setOverallPoint(round(overallPoint, 2));
 
         // calculate rank
         result.setRank(calculateRank(overallPoint).getValue());
@@ -270,5 +274,12 @@ public class RatedRankServiceImpl implements IRatedRankService {
                 list.add(new AverageValueInCriteria(criteriaId, 0.0));
             }
         }
+    }
+
+    private double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.FLOOR);
+        return bd.doubleValue();
     }
 }
