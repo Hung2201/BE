@@ -1,11 +1,13 @@
 package com.example.sourcebase.domain.dto.resdto.user;
 
-import com.example.sourcebase.domain.dto.BaseEntityDto;
+import com.example.sourcebase.domain.Rank;
 import com.example.sourcebase.domain.dto.resdto.FileInfoResDTO;
 import com.example.sourcebase.domain.enumeration.EGender;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -13,10 +15,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@ToString
-public class UserResDTO extends BaseEntityDto {
+public class UserResDTO {
     Long id;
     String name;
     String email;
