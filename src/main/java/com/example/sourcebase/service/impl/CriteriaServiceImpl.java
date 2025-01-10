@@ -104,6 +104,17 @@ public class CriteriaServiceImpl implements ICriteriaService {
     @Override
     @Transactional
     public CriteriaResDTO getCriteriaById(Long id, Long departmentId) {
+
+        // find dcs by criteria
+        List<DepartmentCriterias> dcsByCId = dcRepository.findByCriteria_Id(id);
+        if (dcsByCId.isEmpty()) {
+            throw new AppException(ErrorCode.CRITERIA_NOT_FOUND);
+        }
+        int totalPoints = dcsByCId.stream().map(dc -> dc.getQuestion().getPoint()).reduce(0, Integer::sum);
+        Criteria currentCriteria = dcsByCId.getFirst().getCriteria();
+        currentCriteria.setPoint(totalPoints);
+        criteriaRepository.save(currentCriteria); // done update point of criteria
+
         Criteria criteria = criteriaRepository.findById(id, departmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.CRITERIA_NOT_FOUND));
 
@@ -136,12 +147,7 @@ public class CriteriaServiceImpl implements ICriteriaService {
             criteriaResDTO.setQuestions(null);
         }
 
-        // find dcs by criteria
-        List<DepartmentCriterias> dcsByCId = dcRepository.findByCriteria_Id(id);
-        int totalPoints = dcsByCId.stream().map(dc -> dc.getQuestion().getPoint()).reduce(0, Integer::sum);
-        Criteria currentCriteria = dcsByCId.getFirst().getCriteria();
-        currentCriteria.setPoint(totalPoints);
-        criteriaRepository.save(currentCriteria); // done update point of criteria
+
 
         return criteriaResDTO;
     }
